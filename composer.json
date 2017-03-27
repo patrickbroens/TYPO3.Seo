@@ -1,0 +1,10 @@
+{
+  "name": "patrickbroens/seo",
+  "type": "typo3-cms-extension",
+  "description": "SEO testing",
+  "autoload": {
+    "psr-4": {
+      "PatrickBroens\\Seo\\": "Classes/"
+    }
+  }
+}
