@@ -6,6 +6,9 @@
 			<trans-unit id="SeoHinting.characterCountRange" xml:space="preserve">
 				<source>Recommended length is between {0} and {1}. Current length: {2}</source>
 			</trans-unit>
+			<trans-unit id="SeoHinting.required" xml:space="preserve">
+				<source>This field needs to be filled for more functionality</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -169,6 +169,19 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 							)
 						);
 					break;
+				case 'required':
+					if (
+						0 ===totalCharacters
+					) {
+						markParent = true;
+						labelClass = 'label-danger';
+					}
+
+					$parent.find('.t3js-hint.' + rule.class + ' span')
+						.removeClass()
+						.addClass('label ' + labelClass)
+						.text(TYPO3.lang['SeoHinting.required']);
+					break;
 			}
 		});
 
