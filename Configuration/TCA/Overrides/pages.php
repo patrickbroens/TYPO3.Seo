@@ -7,9 +7,14 @@ $newColumns = [
         'label' => 'LLL:EXT:seo/Resources/Private/Language/TCA/Pages.xlf:field.browserTitle',
         'config' => [
             'type' => 'input',
-            'renderType' => 'seoBrowserTitle',
-            'min' => 40,
-            'max' => 57
+            'renderType' => 'inputTextHintElement',
+            'hints' => [
+                'charCountRange' => [
+                    'min' => 40,
+                    'max' => 57
+                ]
+            ],
+            'size' => 255,
         ]
     ],
     'seo_focus_keyword' => [
@@ -17,19 +22,18 @@ $newColumns = [
         'label' => 'LLL:EXT:seo/Resources/Private/Language/TCA/Pages.xlf:field.focusKeyword',
         'config' => [
             'type' => 'input',
-            'size' => 30,
-            'max' => 30,
-            'eval' => 'required'
+            'renderType' => 'inputTextHintElement',
+            'size' => 150,
+            'hints' => [
+                'required' => []
+            ]
         ]
     ],
     'seo_preview' => [
         'exclude' => false,
         'label' => 'LLL:EXT:seo/Resources/Private/Language/TCA/Pages.xlf:field.preview',
         'config' => [
-            'type' => 'input',
-            'size' => 30,
-            'max' => 30,
-            'eval' => 'required'
+            'type' => 'none'
         ]
     ]
 ];

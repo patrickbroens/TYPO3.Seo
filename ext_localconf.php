@@ -1,11 +1,11 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-// Register the SEO node types
+// Register the hint node types
 $nodeTypes = [
-    'seoBrowserTitle' => [
+    'inputTextHintElement' => [
         1490613007,
-        \PatrickBroens\Seo\View\Wizard\Element\SeoBrowserTitleElement::class
+        \PatrickBroens\Seo\View\Wizard\Element\InputTextHintElement::class
     ]
 ];
 

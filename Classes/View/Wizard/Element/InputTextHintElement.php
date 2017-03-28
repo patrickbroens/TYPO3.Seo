@@ -15,31 +15,31 @@ namespace PatrickBroens\Seo\View\Wizard\Element;
  */
 
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
-use TYPO3\CMS\Core\TypoScript\Parser\TypoScriptParser;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 
 /**
- * SEO browser title element
+ * Input text hint element
  */
-class SeoBrowserTitleElement extends AbstractFormElement
+class InputTextHintElement extends AbstractFormElement
 {
     /**
+     * Render the input text hint element
+     *
      * @return array
      */
-    public function render()
+    public function render(): array
     {
-        $languageService = $this->getLanguageService();
-
-        $table = $this->data['tableName'];
-        $fieldName = $this->data['fieldName'];
-        $row = $this->data['databaseRow'];
         $parameterArray = $this->data['parameterArray'];
 
         $itemValue = $parameterArray['itemFormElValue'];
-        $config = $parameterArray['fieldConf']['config'];
-        $size = MathUtility::forceIntegerInRange($config['size'] ?? $this->defaultInputWidth, $this->minimumInputWidth, $this->maxInputWidth);
+        $configuration = $parameterArray['fieldConf']['config'];
+        $size = MathUtility::forceIntegerInRange(
+            $configuration['size'] ?? $this->defaultInputWidth,
+            $this->minimumInputWidth,
+            $this->maxInputWidth
+        );
         $width = (int)$this->formMaxWidth($size);
 
         $resultArray = $this->initializeResultArray();
@@ -62,7 +62,7 @@ class SeoBrowserTitleElement extends AbstractFormElement
                 't3js-clearable',
                 'hasDefaultValue',
             ]),
-            'data-formengine-seo-rules' => $this->getHintingDataAsJsonString($config),
+            'data-formengine-seo-rules' => $this->getHintingDataAsJsonString($configuration['hints']),
             'data-formengine-seo-params' => json_encode([
                 'field' => $parameterArray['itemFormElName'],
             ]),
@@ -99,23 +99,56 @@ class SeoBrowserTitleElement extends AbstractFormElement
     /**
      * Build JSON string for SEO rules.
      *
-     * @param array $config
+     * @param array $configuration
      * @return string
      */
-    protected function getHintingDataAsJsonString(array $config): string
+    protected function getHintingDataAsJsonString(array $hints): string
     {
-        $config['max'] = (int)$config['max'] ?? 57;
-        $config['min'] = (int)$config['min'] ?? 40;
+        $hintingRules = [];
 
-        $hintingRules = [
-            [
-                'type' => 'charCountRange',
-                'class' => 'hint-charcountrange',
-                'max' => (int)$config['max'],
-                'min' => (int)$config['min']
-            ]
-        ];
+        foreach ($hints as $name => $configuration) {
+            switch ($name) {
+                case 'charCountRange':
+                    $hintingRules[] = $this->characterCountRangeHint($configuration);
+                    break;
+                case 'required':
+                    $hintingRules[] = $this->requiredHint();
+                    break;
+            }
+        }
 
         return json_encode($hintingRules);
+    }
+
+    /**
+     * Get the rule for the character count range hint
+     *
+     * @param array $configuration The hint configuration
+     * @return array
+     */
+    protected function characterCountRangeHint(array $configuration): array
+    {
+        $configuration['max'] = (int)$configuration['max'] ?? 57;
+        $configuration['min'] = (int)$configuration['min'] ?? 40;
+
+        return [
+            'type' => 'charCountRange',
+            'class' => 'hint-charcountrange',
+            'max' => (int)$configuration['max'],
+            'min' => (int)$configuration['min']
+        ];
+    }
+
+    /**
+     * Get the rule for the required hint
+     *
+     * @return array
+     */
+    protected function requiredHint(): array
+    {
+        return [
+            'type' => 'required',
+            'class' => 'hint-required'
+        ];
     }
 }
