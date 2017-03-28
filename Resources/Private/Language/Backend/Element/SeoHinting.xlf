@@ -3,6 +3,9 @@
 	<file source-language="en" datatype="plaintext" original="messages" date="2017-03-27T16:07:00Z" product-name="seo">
 		<header/>
 		<body>
+			<trans-unit id="SeoHinting.characterCount" xml:space="preserve">
+				<source>Recommended maximum length is {0} characters. Current length: {1}</source>
+			</trans-unit>
 			<trans-unit id="SeoHinting.characterCountRange" xml:space="preserve">
 				<source>Recommended length is between {0} and {1}. Current length: {2}</source>
 			</trans-unit>

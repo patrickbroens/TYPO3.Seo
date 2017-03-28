@@ -6,7 +6,12 @@ $nodeTypes = [
     'inputTextHintElement' => [
         1490613007,
         \PatrickBroens\Seo\View\Wizard\Element\InputTextHintElement::class
+    ],
+    'TextHintElement' => [
+        1490716431,
+        \PatrickBroens\Seo\View\Wizard\Element\TextHintElement::class
     ]
+
 ];
 
 foreach ($nodeTypes as $nodeName => $nodeType) {

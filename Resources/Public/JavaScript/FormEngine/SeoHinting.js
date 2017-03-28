@@ -61,8 +61,8 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 				$field = $('[name="' + fieldName + '"]');
 
 			// ignore fields which already have been initialized
-			if ($field.data('main-field') === undefined) {
-				$field.data('main-field', fieldName);
+			if ($field.data('seo-field') === undefined) {
+				$field.data('seo-field', fieldName);
 				$field.data('config', config);
 				SeoHinting.initializeInputField(fieldName);
 			}
@@ -77,7 +77,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 	SeoHinting.initializeInputField = function(fieldName) {
 		var $field = $('[name="' + fieldName + '"]'),
 			$humanReadableField = $('[data-formengine-input-name="' + fieldName + '"]'),
-			$mainField = $('[name="' + $field.data('main-field') + '"]');
+			$mainField = $('[name="' + $field.data('seo-field') + '"]');
 
 		if ($mainField.length === 0) {
 			$mainField = $field;
@@ -85,7 +85,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 
 		var config = $mainField.data('config');
 
-		$humanReadableField.data('main-field', fieldName);
+		$humanReadableField.data('seo-field', fieldName);
 		$humanReadableField.data('config', config);
 
 		// append the counter only at focus to avoid cluttering the DOM
@@ -132,6 +132,25 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 				threshold = 15;
 
 			switch (rule.type) {
+				case 'charCount':
+					if (
+						totalCharacters > rule.max
+					) {
+						markParent = true;
+						labelClass = 'label-danger';
+					}
+
+					$parent.find('.t3js-hint.' + rule.class + ' span')
+						.removeClass()
+						.addClass('label ' + labelClass)
+						.text(TYPO3.lang['SeoHinting.characterCount']
+							.replace(
+								'{0}', rule.max
+							).replace(
+								'{1}', totalCharacters
+							)
+						);
+					break;
 				case 'charCountRange':
 					if (
 						totalCharacters > rule.max
@@ -171,7 +190,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 					break;
 				case 'required':
 					if (
-						0 ===totalCharacters
+						0 === totalCharacters
 					) {
 						markParent = true;
 						labelClass = 'label-danger';
@@ -191,7 +210,10 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 
 			// check tabs
 			SeoHinting.markParentTab($field);
+		} else {
+			$field.closest(SeoHinting.markerSelector).removeClass(SeoHinting.fieldHintClass);
 		}
+
 		return returnValue;
 	};
 
