@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.0" xmlns:t3="http://typo3.org/schemas/xliff">
+	<file source-language="en" datatype="plaintext" original="messages" date="2017-03-27T14:55:00Z" product-name="seo">
+		<header/>
+		<body>
+			<trans-unit id="field.browserTitle" xml:space="preserve">
+				<source>Browser title</source>
+			</trans-unit>
+			<trans-unit id="field.focusKeyword" xml:space="preserve">
+				<source>Focus keyword</source>
+			</trans-unit>
+			<trans-unit id="field.preview" xml:space="preserve">
+				<source>Google Search preview</source>
+			</trans-unit>
+			<trans-unit id="tab.seo" xml:space="preserve">
+				<source>SEO</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
