@@ -128,8 +128,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 		}
 
 		$.each(rules, function(k, rule) {
-			var labelClass = 'label-success',
-				threshold = 15;
+			var labelClass = 'label-success';
 
 			switch (rule.type) {
 				case 'charCount':
@@ -137,7 +136,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 						totalCharacters > rule.max
 					) {
 						markParent = true;
-						labelClass = 'label-danger';
+						labelClass = 'label-warning';
 					}
 
 					$parent.find('.t3js-hint.' + rule.class + ' span')
@@ -157,22 +156,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 						|| totalCharacters < rule.min
 					) {
 						markParent = true;
-						if (
-							totalCharacters - rule.max > threshold
-							|| rule.min - totalCharacters > threshold
-						) {
-							labelClass = 'label-danger';
-						} else if (
-							(
-								totalCharacters > rule.max
-								&& totalCharacters < rule.max + threshold
-							) || (
-								totalCharacters < rule.min
-								&& totalCharacters > rule.min - threshold
-							)
-						) {
-							labelClass = 'label-warning';
-						}
+						labelClass = 'label-warning';
 					}
 
 					$parent.find('.t3js-hint.' + rule.class + ' span')
@@ -193,7 +177,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 						0 === totalCharacters
 					) {
 						markParent = true;
-						labelClass = 'label-danger';
+						labelClass = 'label-warning';
 					}
 
 					$parent.find('.t3js-hint.' + rule.class + ' span')
@@ -205,10 +189,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 		});
 
 		if (markParent) {
-			// mark field
 			$field.closest(SeoHinting.markerSelector).addClass(SeoHinting.fieldHintClass);
-
-			// check tabs
 			SeoHinting.markParentTab($field);
 		} else {
 			$field.closest(SeoHinting.markerSelector).removeClass(SeoHinting.fieldHintClass);
