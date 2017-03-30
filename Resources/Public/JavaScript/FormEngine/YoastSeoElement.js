@@ -182,7 +182,7 @@ define([
 			$progressClone = null;
 
 		$.each(TYPO3.settings.YoastSeo.fields, function(fieldName, functionName) {
-			var $typo3Field = $('[data-formengine-input-name*=\'data[pages][' + TYPO3.settings.YoastSeo.pageId + '][' + fieldName + ']\']');
+			var $typo3Field = $('[data-formengine-input-name*=\'data[' + TYPO3.settings.YoastSeo.table + '][' + TYPO3.settings.YoastSeo.pageId + '][' + fieldName + ']\']');
 
 			if (fieldName === 'seo_browser_title') {
 				$typo3Field.on('focus', function () {

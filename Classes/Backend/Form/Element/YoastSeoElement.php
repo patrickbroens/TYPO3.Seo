@@ -43,16 +43,17 @@ class YoastSeoElement extends AbstractFormElement
     public function render(): array
     {
         $row = $this->data['databaseRow'];
-
+        $table = $this->data['tableName'];
         $targetElementId = uniqid('_YoastSEO_panel_', false);
-        $pageId = (int)$row['uid'];
+        $pageId = ($table === 'pages') ? (int)$row['uid'] : (int)$row['pid'];
+        $recordId = (int)$row['uid'];
         $focusKeyword = $row[self::FOCUS_KEYWORD_COLUMN_NAME];
         $previewDataUrl = vsprintf(
             '/index.php?id=%d&type=%d&L=%d',
             [
                 (int)$pageId,
                 self::FRONTEND_PREVIEW_TYPE,
-                0
+                (int)$row['sys_language_uid']
             ]
         );
 
@@ -76,7 +77,8 @@ class YoastSeoElement extends AbstractFormElement
             $focusKeyword,
             $previewDataUrl,
             $targetElementId,
-            $pageId
+            $table,
+            $recordId
         );
         $resultArray['stylesheetFiles'][] = 'EXT:seo/Resources/Public/Css/Yoast/yoast-seo.min.css';
         $resultArray['additionalInlineLanguageLabelFiles'][] = 'EXT:seo/Resources/Private/Language/Backend/Element/SeoHinting.xlf';
@@ -90,14 +92,16 @@ class YoastSeoElement extends AbstractFormElement
      * @param string $focusKeyword The focus keyword
      * @param string $previewDataUrl The preview data URL
      * @param string $targetElementId The target element ID
-     * @param int $pageId The page ID
+     * @param string $table The table
+     * @param int $recordId The record ID
      * @return string
      */
     protected function getAdditionalJavaScript(
         string $focusKeyword,
         string $previewDataUrl,
         string $targetElementId,
-        int $pageId
+        string $table,
+        int $recordId
     ): string {
         return 'TYPO3.settings.YoastSeo = '
             . json_encode(
@@ -105,7 +109,8 @@ class YoastSeoElement extends AbstractFormElement
                     'focusKeyword' => $focusKeyword,
                     'previewDataUrl' => $previewDataUrl,
                     'targetElementId' => $targetElementId,
-                    'pageId' => $pageId,
+                    'pageId' => $recordId,
+                    'table' => $table,
                     'fields' => [
                         'seo_browser_title' => 'setTitle',
                         'description' => 'setMetaDescription'
