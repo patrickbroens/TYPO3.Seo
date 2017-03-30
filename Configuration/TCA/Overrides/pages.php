@@ -24,14 +24,8 @@ $newColumns = [
         'label' => 'LLL:EXT:seo/Resources/Private/Language/TCA/Pages.xlf:field.browserTitle',
         'config' => [
             'type' => 'input',
-            'renderType' => 'inputTextHintElement',
-            'hints' => [
-                'charCountRange' => [
-                    'min' => 40,
-                    'max' => 57
-                ]
-            ],
             'size' => 255,
+            'eval' => 'trim'
         ]
     ],
     'seo_focus_keyword' => [
@@ -50,7 +44,8 @@ $newColumns = [
         'exclude' => false,
         'label' => 'LLL:EXT:seo/Resources/Private/Language/TCA/Pages.xlf:field.preview',
         'config' => [
-            'type' => 'none'
+            'type' => 'none',
+            'renderType' => 'YoastSeoElement',
         ]
     ]
 ];
