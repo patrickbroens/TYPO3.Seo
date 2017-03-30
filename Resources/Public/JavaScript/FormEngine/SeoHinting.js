@@ -12,11 +12,11 @@
  */
 
 /**
- * Module: PatrickBroens/Seo/FormEngine/SeoHinting
+ * Module: TYPO3/CMS/Seo/FormEngine/SeoHinting
  * Contains all JS functions related to TYPO3 TCEforms/SeoHinting
  * @internal
  */
-define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEngineValidation) {
+define(['jquery'], function ($) {
 
 	/**
 	 * The main SeoHinting object
@@ -124,7 +124,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 			$parent = $field.parents('.t3js-formengine-field-item:first');
 
 		if (!$.isArray(value)) {
-			value = FormEngineValidation.ltrim(value);
+			value = SeoHinting.ltrim(value);
 		}
 
 		$.each(rules, function(k, rule) {
@@ -142,7 +142,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 					$parent.find('.t3js-hint.' + rule.class + ' span')
 						.removeClass()
 						.addClass('label ' + labelClass)
-						.text(TYPO3.lang['SeoHinting.characterCount']
+						.text(TYPO3.lang['SeoHinting.characterCount'].toString()
 							.replace(
 								'{0}', rule.max
 							).replace(
@@ -162,7 +162,7 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 					$parent.find('.t3js-hint.' + rule.class + ' span')
 						.removeClass()
 						.addClass('label ' + labelClass)
-						.text(TYPO3.lang['SeoHinting.characterCountRange']
+						.text(TYPO3.lang['SeoHinting.characterCountRange'].toString()
 							.replace(
 								'{0}', rule.min
 							).replace(
@@ -197,8 +197,6 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 
 		return returnValue;
 	};
-
-
 
 	/**
 	 * Validate the complete form
@@ -263,6 +261,19 @@ define(['jquery', 'TYPO3/CMS/Backend/FormEngineValidation'], function ($, FormEn
 		var fieldText = $field.val();
 
 		return fieldText.length;
+	};
+
+	/**
+	 *
+	 * @param {String} value
+	 * @returns {String}
+	 */
+	SeoHinting.ltrim = function(value) {
+		var theVal = '' + value;
+		if (!value) {
+			return '';
+		}
+		return theVal.replace(/^\s+/, '');
 	};
 
 	SeoHinting.initialize();
