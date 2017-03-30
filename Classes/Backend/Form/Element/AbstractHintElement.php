@@ -1,5 +1,5 @@
 <?php
-namespace PatrickBroens\Seo\View\Wizard\Element;
+namespace PatrickBroens\Seo\Backend\Form\Element;
 
 /*
  * This file is part of the TYPO3 CMS project.

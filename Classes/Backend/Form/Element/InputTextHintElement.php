@@ -1,5 +1,5 @@
 <?php
-namespace PatrickBroens\Seo\View\Wizard\Element;
+namespace PatrickBroens\Seo\Backend\Form\Element;
 
 /*
  * This file is part of the TYPO3 CMS project.
@@ -14,7 +14,6 @@ namespace PatrickBroens\Seo\View\Wizard\Element;
  * The TYPO3 project - inspiring people to share!
  */
 
-use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
