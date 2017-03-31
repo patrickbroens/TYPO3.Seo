@@ -31,24 +31,42 @@ define([
 
 	var YoastSeoElement = {
 		targetElement: $('#' + TYPO3.settings.YoastSeo.targetElementId),
-		previewRequest:  $.get(TYPO3.settings.YoastSeo.previewDataUrl)
+		previewRequest:  $.get(TYPO3.settings.YoastSeo.previewDataUrl),
+		pageTitle: '',
+		siteTitle: '',
+		pageTitleSeparator: ': ',
+		pageTitleFirst: false,
+		noPageTitle: 0
 	};
 
-	// make sure the document is ready before we interact with the DOM
-	// use the jQuery (ready) callback
 	YoastSeoElement.initialize = function() {
 		YoastSeoElement.previewRequest
 			.done(function (previewDocument) {
-				var $snippetPreviewContainer = YoastSeoElement.buildSnippetPreviewContainer();
-				$snippetPreviewContainer.attr('id', 'snippet');
+				if (previewDocument.configuration.pageTitleOverride) {
+					YoastSeoElement.buildCallout(TYPO3.lang['YoastSeoElement.callout.pageTitleOverride']);
+				} else {
+					YoastSeoElement.pageTitle = previewDocument.configuration.pageTitle;
+					YoastSeoElement.siteTitle = previewDocument.configuration.siteTitle;
+					YoastSeoElement.pageTitleSeparator = previewDocument.configuration.pageTitleSeparator;
+					YoastSeoElement.pageTitleFirst = previewDocument.configuration.pageTitleFirst;
+					YoastSeoElement.noPageTitle = previewDocument.configuration.noPageTitle;
 
-				var app = YoastSeoElement.getApplication(previewDocument, $snippetPreviewContainer);
+					if (YoastSeoElement.noPageTitle === 1) {
+						YoastSeoElement.buildCallout(TYPO3.lang['YoastSeoElement.callout.onlySiteTitle']);
+					}
 
-				YoastSeoElement.modifySnippetPreviewContainer($snippetPreviewContainer);
+					var $snippetPreviewContainer = YoastSeoElement.buildSnippetPreviewContainer();
+					$snippetPreviewContainer.attr('id', 'snippet');
 
-				app.refresh();
+					var app = YoastSeoElement.getApplication(previewDocument, $snippetPreviewContainer);
 
-				YoastSeoElement.initializeFieldSynchronization(app);
+					YoastSeoElement.modifySnippetPreviewContainer($snippetPreviewContainer);
+
+					app.refresh();
+
+					YoastSeoElement.initializeFieldSynchronization(app);
+				}
+
 			})
 			.fail(function (jqXHR) {
 				Notification.error('Loading the page content preview failed', [jqXHR.status, jqXHR.statusText].join(' '), 0);
@@ -63,10 +81,8 @@ define([
 	};
 
 	YoastSeoElement.getApplication = function(previewDocument, $snippetPreviewContainer) {
-		var $previewDocument = $(previewDocument),
-			$metaSection = $previewDocument.find('meta'),
-			$contentElements = $previewDocument.find('content>element'),
-			pageContent = '',
+		var meta = previewDocument.meta,
+			content = previewDocument.content,
 			$readabilityPanel = null,
 			$seoPanel = null,
 			$targetPanels = YoastSeoElement.targetElement.append('<div class="row" />').find('.row');
@@ -87,12 +103,8 @@ define([
 			).find('.seoPanel');
 		}
 
-		$contentElements.each(function (index, element) {
-			pageContent += element.textContent;
-		});
-
 		var app = new YoastSEO.App({
-			snippetPreview: YoastSeoElement.getSnippetPreview($metaSection, $snippetPreviewContainer),
+			snippetPreview: YoastSeoElement.getSnippetPreview(meta, $snippetPreviewContainer),
 			targets: {
 				output: $seoPanel.find('[data-panel-content]').attr('id'),
 				contentOutput: $readabilityPanel.find('[data-panel-content]').attr('id')
@@ -100,9 +112,9 @@ define([
 			callbacks: {
 				getData: function () {
 					return {
-						title: $metaSection.find('title').text(),
+						title: meta.browserTitle ? meta.browserTitle : meta.title,
 						keyword: TYPO3.settings.YoastSeo.focusKeyword,
-						text: pageContent
+						text: content
 					};
 				},
 				bindElementEvents: function (app) {
@@ -114,7 +126,7 @@ define([
 					$readabilityPanel.find('.wpseo-score-icon').first().addClass(YoastSEO.scoreToRating(score / 10));
 				}
 			},
-			locale: $metaSection.find('locale').text(),
+			locale: meta.locale,
 			translations: (
 				window.tx_yoast_seo !== undefined
 				&& window.tx_yoast_seo !== null
@@ -137,13 +149,13 @@ define([
 		return app;
 	};
 
-	YoastSeoElement.getSnippetPreview = function($metaSection, $snippetPreview) {
+	YoastSeoElement.getSnippetPreview = function(meta, $snippetPreview) {
 		return new YoastSEO.SnippetPreview({
 			data: {
-				title: $metaSection.find('title').text(),
-				metaDesc: $metaSection.find('description').text()
+				title: meta.browserTitle ? meta.browserTitle : meta.title,
+				metaDesc: meta.description
 			},
-			baseURL: $metaSection.find('url').text(),
+			baseURL: meta.url,
 			placeholder: {
 				urlPath: ''
 			},
@@ -206,12 +218,61 @@ define([
 			}
 
 			$typo3Field.on('keyup', function() {
-				snippetPreview[functionName]($typo3Field.val());
+				var value = $typo3Field.val();
+
+				if (fieldName === 'seo_browser_title') {
+					value = YoastSeoElement.generatePageTitle(value);
+				}
+
+				snippetPreview[functionName](value);
+
 				if (fieldName === 'seo_browser_title') {
 					$progressClone.val($progressBar.val()).attr('class', $progressBar.attr('class'));
 				}
 			});
 		});
+	};
+
+	YoastSeoElement.generatePageTitle = function(fieldValue) {
+		var pageTitle;
+
+		if (YoastSeoElement.noPageTitle === 1) {
+			pageTitle = YoastSeoElement.siteTitle;
+		} else {
+			if (
+				0 === fieldValue.length
+				|| !fieldValue.trim()
+			) {
+				fieldValue = YoastSeoElement.pageTitle;
+			}
+			var first = YoastSeoElement.pageTitleFirst ? fieldValue : YoastSeoElement.siteTitle,
+				last = YoastSeoElement.pageTitleFirst ? YoastSeoElement.siteTitle : fieldValue;
+
+			pageTitle = first + YoastSeoElement.pageTitleSeparator + last;
+		}
+
+		return pageTitle;
+	};
+
+	YoastSeoElement.buildCallout = function(text) {
+		YoastSeoElement.targetElement.append(
+			'<div class="callout callout-warning">' +
+			'<div class="media">' +
+			'<div class="media-left">' +
+			'<span class="fa-stack fa-lg callout-icon">' +
+			'<i class="fa fa-circle fa-stack-2x"></i>' +
+			'<i class="fa fa-info fa-stack-1x"></i>' +
+			'</span>' +
+			'</div>' +
+			'<div class="media-body">' +
+			'<h4 class="callout-title">Google Search Preview</h4>' +
+			'<div class="callout-body">' +
+			text +
+			'</div>' +
+			'</div>' +
+			'</div>' +
+			'</div>'
+		);
 	};
 
 	YoastSeoElement.initialize();

@@ -4,7 +4,7 @@
 		<header/>
 		<body>
 			<trans-unit id="field.browserTitle" xml:space="preserve">
-				<source>Browser title</source>
+				<source>Browser title (overrides page title)</source>
 			</trans-unit>
 			<trans-unit id="field.focusKeyword" xml:space="preserve">
 				<source>Focus keyword</source>

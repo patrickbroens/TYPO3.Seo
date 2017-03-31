@@ -1,61 +1,17 @@
+# Render the preview as json
 seo_preview = PAGE
 seo_preview {
     typeNum = {$config.seo.frontend_preview_type}
+    headerData >
     config {
         disableAllHeaderCode = 1
         no_cache = 1
-        additionalHeaders {
-            10 {
-                header = Content-type: text/xml; charset=UTF-8
-            }
-        }
+        debug = 0
+        additionalHeaders.10.header = Content-type: application/json; charset=UTF-8
     }
 
-    wrap = <?xml version="1.0" encoding="UTF-8"?><preview>|</preview>
-
-    20 = COA
-    20 {
-        10 = TEXT
-        10 {
-            stdWrap.typolink {
-                parameter = #
-                returnLast = url
-                forceAbsoluteUrl = 1
-                useCacheHash = 1
-            }
-
-            htmlSpecialChars = 1
-
-            wrap = <url>|</url>
-        }
-
-        20 = TEXT
-        20.field = title
-        20.wrap = <title><![CDATA[|]]></title>
-
-        30 = TEXT
-        30.field = description
-        30.wrap = <description><![CDATA[|]]></description>
-
-        40 = TEXT
-        40.data = TSFE:config|config|locale_all
-        40.htmlSpecialChars = 1
-        40.wrap = <locale>|</locale>
-
-        wrap = <meta>|</meta>
-    }
-
-    30 = CONTENT
-    30 {
-        table = tt_content
-
-        renderObj < tt_content
-        renderObj.stdWrap.wrap = <element><![CDATA[|]]></element>
-        renderObj.stdWrap.replacement {
-            10.search.char = 10
-            10.replace =
-        }
-
-        wrap = <content>|</content>
+    10 = USER
+    10 {
+        userFunc = PatrickBroens\Seo\Frontend\Page\PreviewGenerator->generatePreview
     }
 }
