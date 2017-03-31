@@ -72,11 +72,19 @@ define([
 			$targetPanels = YoastSeoElement.targetElement.append('<div class="row" />').find('.row');
 
 		if (YoastSeoElement.targetElement.hasClass('yoastSeo--small')) {
-			$readabilityPanel = $targetPanels.append(YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'readability')).find('.readabilityPanel');
-			$seoPanel = $targetPanels.append(YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'seo')).find('.seoPanel');
+			$readabilityPanel = $targetPanels.append(
+				YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'readability')
+			).find('.readabilityPanel');
+			$seoPanel = $targetPanels.append(
+				YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'seo')
+			).find('.seoPanel');
 		} else {
-			$readabilityPanel = YoastSeoElement.targetElement.append(YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'readability')).find('.readabilityPanel');
-			$seoPanel = YoastSeoElement.targetElement.append(YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'seo')).find('.seoPanel');
+			$readabilityPanel = YoastSeoElement.targetElement.append(
+				YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'readability')
+			).find('.readabilityPanel');
+			$seoPanel = YoastSeoElement.targetElement.append(
+				YoastSeoElement.buildYoastPanelMarkup(TYPO3.settings.YoastSeo.targetElementId, 'seo')
+			).find('.seoPanel');
 		}
 
 		$contentElements.each(function (index, element) {
@@ -107,7 +115,11 @@ define([
 				}
 			},
 			locale: $metaSection.find('locale').text(),
-			translations: (window.tx_yoast_seo !== undefined && window.tx_yoast_seo !== null && window.tx_yoast_seo.translations !== undefined ? window.tx_yoast_seo.translations : null)
+			translations: (
+				window.tx_yoast_seo !== undefined
+				&& window.tx_yoast_seo !== null
+				&& window.tx_yoast_seo.translations !== undefined ? window.tx_yoast_seo.translations : null
+			)
 		});
 
 		$readabilityPanel.find('[data-panel-title]').text((app.i18n.dgettext('js-text-analysis', 'Readability')));
@@ -201,10 +213,6 @@ define([
 			});
 		});
 	};
-
-
-
-
 
 	YoastSeoElement.initialize();
 
