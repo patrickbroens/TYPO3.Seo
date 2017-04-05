@@ -19,46 +19,27 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 
 /**
- * Text hint element
+ * Focus keyword element
  */
-class TextHintElement extends AbstractHintElement
+class FocusKeywordElement extends AbstractHintElement
 {
     /**
-     * The number of chars expected per row when the height of a text area field is
-     * automatically calculated based on the number of characters found in the field content.
+     * Render the input text hint element
      *
-     * @var int
+     * @return array
      */
-    protected $charactersPerRow = 40;
-
-    /**
-     * This will render a <textarea>
-     *
-     * @return array As defined in initializeResultArray() of AbstractNode
-     */
-    public function render()
+    public function render(): array
     {
         $parameterArray = $this->data['parameterArray'];
 
         $itemValue = $parameterArray['itemFormElValue'];
         $configuration = $parameterArray['fieldConf']['config'];
-        $cols = MathUtility::forceIntegerInRange($configuration['cols'] ?: $this->defaultInputWidth, $this->minimumInputWidth, $this->maxInputWidth);
-        $width = $this->formMaxWidth($cols);
-
-        // Setting number of rows
-        $rows = MathUtility::forceIntegerInRange($configuration['rows'] ?: 5, 1, 20);
-        $originalRows = $rows;
-        $itemFormElementValueLength = strlen($itemValue);
-        if ($itemFormElementValueLength > $this->charactersPerRow * 2) {
-            $rows = MathUtility::forceIntegerInRange(
-                round($itemFormElementValueLength / $this->charactersPerRow),
-                count(explode(LF, $itemValue)),
-                20
-            );
-            if ($rows < $originalRows) {
-                $rows = $originalRows;
-            }
-        }
+        $size = MathUtility::forceIntegerInRange(
+            $configuration['size'] ?? $this->defaultInputWidth,
+            $this->minimumInputWidth,
+            $this->maxInputWidth
+        );
+        $width = (int)$this->formMaxWidth($size);
 
         $resultArray = $this->initializeResultArray();
 
@@ -71,31 +52,33 @@ class TextHintElement extends AbstractHintElement
 
         $fieldControlResult = $this->renderFieldControl();
         $fieldControlHtml = $fieldControlResult['html'];
-        $resultArray = $this->mergeChildReturnIntoExistingResult($resultArray, $fieldControlResult, false);
 
         $attributes = [
-            'id' => StringUtility::getUniqueId('formengine-textarea-'),
-            'name' => htmlspecialchars($parameterArray['itemFormElName']),
+            'value' => '',
+            'id' => StringUtility::getUniqueId('formengine-input-'),
+            'class' => implode(' ', [
+                'form-control',
+                't3js-clearable',
+                'hasDefaultValue',
+            ]),
             'data-formengine-seo-rules' => $this->getHintingDataAsJsonString($configuration['hints']),
             'data-formengine-seo-params' => json_encode([
                 'field' => $parameterArray['itemFormElName'],
             ]),
-            'data-formengine-input-name' => htmlspecialchars($parameterArray['itemFormElName']),
-            'rows' => $rows,
-            'wrap' => $configuration['wrap'] ?: 'virtual',
-            'onChange' => implode('', $parameterArray['fieldChangeFunc']),
-            'class' => implode(' ', [
-                'form-control',
-                't3js-formengine-textarea',
-                'formengine-textarea'
-            ])
+            'data-formengine-input-params' => json_encode([
+                'field' => $parameterArray['itemFormElName'],
+                'evalList' => '',
+                'is_in' => ''
+            ]),
+            'data-formengine-input-name' => $parameterArray['itemFormElName'],
         ];
 
         $html = [];
         $html[] = '<div class="form-control-wrap" style="max-width: ' . $width . 'px">';
         $html[] =  '<div class="form-wizards-wrap">';
         $html[] =      '<div class="form-wizards-element">';
-        $html[] =          '<textarea ' . GeneralUtility::implodeAttributes($attributes, true) . '>' . htmlspecialchars($itemValue) . '</textarea>';
+        $html[] =          '<input type="text"' . GeneralUtility::implodeAttributes($attributes, true) . ' />';
+        $html[] =          '<input type="hidden" name="' . $parameterArray['itemFormElName'] . '" value="' . htmlspecialchars($itemValue) . '" />';
         $html[] =      '</div>';
         $html[] =      '<div class="form-wizards-items-aside">';
         $html[] =          '<div class="btn-group">';

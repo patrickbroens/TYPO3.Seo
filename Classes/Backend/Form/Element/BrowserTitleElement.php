@@ -19,9 +19,9 @@ use TYPO3\CMS\Core\Utility\MathUtility;
 use TYPO3\CMS\Core\Utility\StringUtility;
 
 /**
- * Input text hint element
+ * Browser title element
  */
-class InputTextHintElement extends AbstractHintElement
+class BrowserTitleElement extends AbstractHintElement
 {
     /**
      * Render the input text hint element
@@ -30,10 +30,13 @@ class InputTextHintElement extends AbstractHintElement
      */
     public function render(): array
     {
+        $row = $this->data['databaseRow'];
         $parameterArray = $this->data['parameterArray'];
 
         $itemValue = $parameterArray['itemFormElValue'];
         $configuration = $parameterArray['fieldConf']['config'];
+        $evalList = GeneralUtility::trimExplode(',', $configuration['eval'], true);
+        $placeholderField = trim($configuration['placeholderField']);
         $size = MathUtility::forceIntegerInRange(
             $configuration['size'] ?? $this->defaultInputWidth,
             $this->minimumInputWidth,
@@ -42,6 +45,28 @@ class InputTextHintElement extends AbstractHintElement
         $width = (int)$this->formMaxWidth($size);
 
         $resultArray = $this->initializeResultArray();
+
+        // @todo: The whole eval handling is a mess and needs refactoring
+        foreach ($evalList as $func) {
+            // @todo: This is ugly: The code should find out on it's own whether a eval definition is a
+            // @todo: keyword like "date", or a class reference. The global registration could be dropped then
+            // Pair hook to the one in \TYPO3\CMS\Core\DataHandling\DataHandler::checkValue_input_Eval()
+            if (isset($GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['tce']['formevals'][$func])) {
+                if (class_exists($func)) {
+                    $evalObj = GeneralUtility::makeInstance($func);
+                    if (method_exists($evalObj, 'deevaluateFieldValue')) {
+                        $_params = [
+                            'value' => $itemValue
+                        ];
+                        $itemValue = $evalObj->deevaluateFieldValue($_params);
+                    }
+                    if (method_exists($evalObj, 'returnFieldJS')) {
+                        $resultArray['additionalJavaScriptPost'][] = 'TBE_EDITOR.customEvalFunctions[' . GeneralUtility::quoteJSvalue($func) . ']'
+                            . ' = function(value) {' . $evalObj->returnFieldJS() . '};';
+                    }
+                }
+            }
+        }
 
         $fieldInformationResult = $this->renderFieldInformation();
         $resultArray = $this->mergeChildReturnIntoExistingResult($resultArray, $fieldInformationResult, false);
@@ -67,7 +92,7 @@ class InputTextHintElement extends AbstractHintElement
             ]),
             'data-formengine-input-params' => json_encode([
                 'field' => $parameterArray['itemFormElName'],
-                'evalList' => '',
+                'evalList' => implode(',', $evalList),
                 'is_in' => ''
             ]),
             'data-formengine-input-name' => $parameterArray['itemFormElName'],
@@ -77,7 +102,7 @@ class InputTextHintElement extends AbstractHintElement
         $html[] = '<div class="form-control-wrap" style="max-width: ' . $width . 'px">';
         $html[] =  '<div class="form-wizards-wrap">';
         $html[] =      '<div class="form-wizards-element">';
-        $html[] =          '<input type="text"' . GeneralUtility::implodeAttributes($attributes, true) . ' />';
+        $html[] =          '<input type="text"' . GeneralUtility::implodeAttributes($attributes, true) . ' placeholder="' . $row[$placeholderField] . '" />';
         $html[] =          '<input type="hidden" name="' . $parameterArray['itemFormElName'] . '" value="' . htmlspecialchars($itemValue) . '" />';
         $html[] =      '</div>';
         $html[] =      '<div class="form-wizards-items-aside">';

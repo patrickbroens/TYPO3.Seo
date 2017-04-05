@@ -1,23 +1,23 @@
 <?php
 defined('TYPO3_MODE') or die();
 
-// Register the hint node types
+// Register the SEO node types
 $nodeTypes = [
-    'BrowserTitleElement' => [
+    'SeoBrowserTitleElement' => [
         1490866610,
         \PatrickBroens\Seo\Backend\Form\Element\BrowserTitleElement::class
     ],
-    'inputTextHintElement' => [
+    'SeoFocusKeywordElement' => [
         1490613007,
-        \PatrickBroens\Seo\Backend\Form\Element\InputTextHintElement::class
+        \PatrickBroens\Seo\Backend\Form\Element\FocusKeywordElement::class
     ],
-    'TextHintElement' => [
+    'SeoDescriptionElement' => [
         1490716431,
-        \PatrickBroens\Seo\Backend\Form\Element\TextHintElement::class
+        \PatrickBroens\Seo\Backend\Form\Element\DescriptionElement::class
     ],
-    'YoastSeoElement' => [
+    'SeoYoastElement' => [
         1490777645,
-        \PatrickBroens\Seo\Backend\Form\Element\YoastSeoElement::class
+        \PatrickBroens\Seo\Backend\Form\Element\YoastElement::class
     ]
 
 ];
@@ -30,11 +30,13 @@ foreach ($nodeTypes as $nodeName => $nodeType) {
     ];
 }
 
+// Add TypoScript constant value for the frontend preview type (typeNum)
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScriptConstants(
     'config.seo.frontend_preview_type = '
-        . \PatrickBroens\Seo\Backend\Form\Element\YoastSeoElement::FRONTEND_PREVIEW_TYPE
+        . \PatrickBroens\Seo\Backend\Form\Element\YoastElement::FRONTEND_PREVIEW_TYPE
 );
 
+// Add the TypoScript setup for the frontend preview rendering
 \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addTypoScript(
     'Seo',
     'setup',

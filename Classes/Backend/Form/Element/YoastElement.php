@@ -17,9 +17,13 @@ namespace PatrickBroens\Seo\Backend\Form\Element;
 use TYPO3\CMS\Backend\Form\Element\AbstractFormElement;
 
 /**
- * Yoast SEO element
+ * Yoast element
+ *
+ * Shows preview, readability and seo panel
+ *
+ * This element is solely a placeholder for javascript functionality
  */
-class YoastSeoElement extends AbstractFormElement
+class YoastElement extends AbstractFormElement
 {
     /**
      * The column name for the focus keyword
@@ -45,17 +49,6 @@ class YoastSeoElement extends AbstractFormElement
         $row = $this->data['databaseRow'];
         $table = $this->data['tableName'];
         $targetElementId = uniqid('_YoastSEO_panel_', false);
-        $pageId = ($table === 'pages') ? (int)$row['uid'] : (int)$row['pid'];
-        $recordId = (int)$row['uid'];
-        $focusKeyword = $row[self::FOCUS_KEYWORD_COLUMN_NAME];
-        $previewDataUrl = vsprintf(
-            '/index.php?id=%d&type=%d&L=%d',
-            [
-                (int)$pageId,
-                self::FRONTEND_PREVIEW_TYPE,
-                (int)$row['sys_language_uid']
-            ]
-        );
 
         $resultArray = $this->initializeResultArray();
 
@@ -74,11 +67,9 @@ class YoastSeoElement extends AbstractFormElement
         $resultArray['html'] = $html;
         $resultArray['requireJsModules'][] = 'TYPO3/CMS/Seo/FormEngine/YoastSeoElement';
         $resultArray['additionalJavaScriptPost'][] = $this->getAdditionalJavaScript(
-            $focusKeyword,
-            $previewDataUrl,
             $targetElementId,
             $table,
-            $recordId
+            $row
         );
         $resultArray['stylesheetFiles'][] = 'EXT:seo/Resources/Public/Css/Yoast/yoast-seo.min.css';
         $resultArray['additionalInlineLanguageLabelFiles'][] = 'EXT:seo/Resources/Private/Language/Backend/Element/SeoHinting.xlf';
@@ -90,27 +81,20 @@ class YoastSeoElement extends AbstractFormElement
     /**
      * Get the additional JavaScript to initialize Yoast SEO preview snippet
      *
-     * @param string $focusKeyword The focus keyword
-     * @param string $previewDataUrl The preview data URL
      * @param string $targetElementId The target element ID
-     * @param string $table The table
-     * @param int $recordId The record ID
+     * @param string $table The table name
+     * @param array $row The record row
      * @return string
      */
-    protected function getAdditionalJavaScript(
-        string $focusKeyword,
-        string $previewDataUrl,
-        string $targetElementId,
-        string $table,
-        int $recordId
-    ): string {
+    protected function getAdditionalJavaScript(string $targetElementId, string $table, array $row): string
+    {
         return 'TYPO3.settings.YoastSeo = '
             . json_encode(
                 [
-                    'focusKeyword' => $focusKeyword,
-                    'previewDataUrl' => $previewDataUrl,
+                    'focusKeyword' => $row[self::FOCUS_KEYWORD_COLUMN_NAME],
+                    'previewDataUrl' => $this->getPreviewDataUrl($table, $row),
                     'targetElementId' => $targetElementId,
-                    'pageId' => $recordId,
+                    'pageId' => (int)$row['uid'],
                     'table' => $table,
                     'fields' => [
                         'seo_browser_title' => 'setTitle',
@@ -119,5 +103,38 @@ class YoastSeoElement extends AbstractFormElement
                 ]
             )
             . ';';
+    }
+
+    /**
+     * Get the preview data url
+     *
+     * @param string $table The table name
+     * @param array $row The record row
+     * @return string
+     */
+    protected function getPreviewDataUrl(string $table, array $row): string
+    {
+        return vsprintf(
+            '/index.php?id=%d&type=%d&L=%d',
+            [
+                $this->getPageId($table, $row),
+                self::FRONTEND_PREVIEW_TYPE,
+                (int)$row['sys_language_uid']
+            ]
+        );
+    }
+
+    /**
+     * Get the page ID
+     *
+     * Depending on table name
+     *
+     * @param string $table The table name
+     * @param array $row The record row
+     * @return int
+     */
+    protected function getPageId(string $table, array $row): int
+    {
+        return (int)(($table === 'pages') ? $row['uid'] : $row['pid']);
     }
 }

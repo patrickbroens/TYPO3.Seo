@@ -24,7 +24,7 @@ abstract class AbstractHintElement extends AbstractFormElement
     /**
      * Build JSON string for SEO rules.
      *
-     * @param array $configuration
+     * @param array $hints
      * @return string
      */
     protected function getHintingDataAsJsonString(array $hints): string

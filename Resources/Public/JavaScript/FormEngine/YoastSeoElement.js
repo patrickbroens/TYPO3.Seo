@@ -112,7 +112,7 @@ define([
 			callbacks: {
 				getData: function () {
 					return {
-						title: meta.browserTitle ? meta.browserTitle : meta.title,
+						title: meta.browserTitle ? YoastSeoElement.generatePageTitle(meta.browserTitle) : meta.title,
 						keyword: TYPO3.settings.YoastSeo.focusKeyword,
 						text: content
 					};
@@ -152,7 +152,7 @@ define([
 	YoastSeoElement.getSnippetPreview = function(meta, $snippetPreview) {
 		return new YoastSEO.SnippetPreview({
 			data: {
-				title: meta.browserTitle ? meta.browserTitle : meta.title,
+				title: meta.browserTitle ? YoastSeoElement.generatePageTitle(meta.browserTitle) : meta.title,
 				metaDesc: meta.description
 			},
 			baseURL: meta.url,
@@ -160,7 +160,10 @@ define([
 				urlPath: ''
 			},
 			targetElement: $snippetPreview.get(0),
-			callbacks: {}
+			callbacks: {
+				saveSnippetData: function(data) {
+				}
+			}
 		});
 	};
 

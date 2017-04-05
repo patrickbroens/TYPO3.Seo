@@ -27,12 +27,14 @@ class PreviewGenerator
     /**
      * The content object renderer
      *
-     * @var
+     * @var ContentObjectRenderer
      */
     protected $contentObjectRenderer;
 
     /**
      * Constructor
+     *
+     * Set the content object renderer
      */
     public function __construct()
     {
@@ -210,7 +212,7 @@ class PreviewGenerator
      *
      * @return TypoScriptFrontendController
      */
-    protected function getTypoScriptFrontendController()
+    protected function getTypoScriptFrontendController(): TypoScriptFrontendController
     {
         return $GLOBALS['TSFE'];
     }
